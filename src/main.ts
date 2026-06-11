@@ -5,6 +5,9 @@ import { AppModule } from './app.module';
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
+  const expressApp = app.getHttpAdapter().getInstance();
+  expressApp.disable('etag');
+
   const allowedOrigins = [
     'https://5umm0n3r5-5c4nn3r.dev',
     'http://localhost:5500',
@@ -12,9 +15,10 @@ async function bootstrap() {
   ];
 
   app.use((req, res, next) => {
-    res.setHeader('Cache-Control', 'no-store');
+    res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
     res.setHeader('Pragma', 'no-cache');
     res.setHeader('Expires', '0');
+    res.setHeader('Surrogate-Control', 'no-store');
     next();
   });
 
