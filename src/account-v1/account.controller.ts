@@ -1,5 +1,5 @@
 import { Controller, Get, Param, Query } from "@nestjs/common";
-import { RegionQueryDto } from "src/common/dto/region-query.dto";
+import { RegionQueryDto } from "../common/dto/region-query.dto";
 import { AccountService } from "./account.service";
 
 @Controller('account-v1')

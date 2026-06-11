@@ -1,6 +1,6 @@
 import { Controller, Get, Param, Query } from "@nestjs/common";
 import { GetMatchIdsQueryDto } from "./dto/get-match-ids-query.dto";
-import { RegionQueryDto } from "src/common/dto/region-query.dto";
+import { RegionQueryDto } from "../common/dto/region-query.dto";
 import { MatchesService } from "./matches.service";
 
 @Controller('match-v5')

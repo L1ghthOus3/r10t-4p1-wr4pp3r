@@ -1,6 +1,6 @@
 import { Injectable } from "@nestjs/common";
-import { clusterHost, key } from "src/utils/config";
-import { getJson } from "src/utils/getJson";
+import { clusterHost, key } from "../utils/config";
+import { getJson } from "../utils/getJson";
 
 @Injectable()
 export class AccountService {
