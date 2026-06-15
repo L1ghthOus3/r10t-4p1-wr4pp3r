@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { clusterHost, key, platformHost } from '../utils/config';
+import { key, platformHost } from '../utils/config';
 import { getJson } from '../utils/getJson';
 
 @Injectable()
@@ -11,7 +11,7 @@ export class LeagueService {
       const url =
         `https://${platformHost(region)}.api.riotgames.com/lol/league/v4/entries/by-puuid` +
         `/${encodeURIComponent(puuid)}?${key()}`;
-      const entries = await getJson(url, 'Ranked');
+      const entries = await getJson<{ queueType: string }[]>(url, 'Ranked');
       return (
         entries.find((e) => e.queueType === 'RANKED_SOLO_5x5') ||
         entries.find((e) => e.queueType === 'RANKED_FLEX_SR') ||

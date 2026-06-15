@@ -10,11 +10,11 @@ export class MatchesService {
     const url =
       `https://${clusterHost(region)}.api.riotgames.com/lol/match/v5/matches/by-puuid` +
       `/${encodeURIComponent(puuid)}/ids?start=${start}&count=${count}&${key()}`;
-    return getJson(url, 'Match list');
+    return getJson<string[]>(url, 'Match list');
   }
 
   async getMatch(id: string, region: string) {
     const url = `https://${clusterHost(region)}.api.riotgames.com/lol/match/v5/matches/${encodeURIComponent(id)}?${key()}`;
-    return getJson(url, 'Match');
+    return getJson<Record<string, unknown>>(url, 'Match');
   }
 }
