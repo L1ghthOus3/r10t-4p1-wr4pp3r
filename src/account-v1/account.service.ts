@@ -1,18 +1,23 @@
-import { Injectable } from "@nestjs/common";
-import { clusterHost, key } from "../utils/config";
-import { getJson } from "../utils/getJson";
+import { Injectable } from '@nestjs/common';
+import { clusterHost, key } from '../utils/config';
+import { getJson } from '../utils/getJson';
+import { AccountDto } from './dto/account.dto';
 
 @Injectable()
 export class AccountService {
-    constructor() { }
+  constructor() {}
 
-    async getAccount(username: string, tagLine: string, region: string) {
-        const url =
-            `https://${clusterHost(region)}.api.riotgames.com/riot/account/v1/accounts/by-riot-id` +
-            `/${encodeURIComponent(username)}/${encodeURIComponent(tagLine)}?${key()}`;
-        return getJson(url, "Account").catch((e) => {
-            if (/not found/.test(e.message)) throw new Error("No Riot account with that name#tag.");
-            throw e;
-        });
-    }
+  async getAccount(
+    username: string,
+    tagLine: string,
+    region: string,
+  ): Promise<AccountDto> {
+    const url = `https://${clusterHost(region)}.api.riotgames.com/riot/account/v1/accounts/by-riot-id/${encodeURIComponent(username)}/${encodeURIComponent(tagLine)}?${key()}`;
+    return getJson<AccountDto>(url, 'Account').catch((e) => {
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unsafe-member-access
+      if (/not found/.test(e.message))
+        throw new Error('No Riot account with that name#tag.');
+      throw e;
+    });
+  }
 }
