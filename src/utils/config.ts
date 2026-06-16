@@ -1,4 +1,4 @@
-export const REGIONAL_CLUSTER = {
+export const REGIONAL_CLUSTER: Record<string, string> = {
   BR1: 'americas',
   LA1: 'americas',
   LA2: 'americas',
@@ -15,5 +15,6 @@ export const REGIONAL_CLUSTER = {
 };
 export const key = () =>
   `api_key=${encodeURIComponent(process.env.RIOT_API_KEY || '')}`;
-export const clusterHost = (region) => REGIONAL_CLUSTER[region] || 'europe';
-export const platformHost = (region) => region.toLowerCase();
+export const clusterHost = (region: string) =>
+  REGIONAL_CLUSTER[region] || 'europe';
+export const platformHost = (region: string) => region.toLowerCase();

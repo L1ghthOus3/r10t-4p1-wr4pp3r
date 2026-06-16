@@ -1,9 +1,11 @@
 import { ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
+import { NestExpressApplication } from '@nestjs/platform-express';
+import { type NextFunction, type Request, type Response } from 'express';
 import { AppModule } from './app.module';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create<NestExpressApplication>(AppModule);
 
   const expressApp = app.getHttpAdapter().getInstance();
   expressApp.disable('etag');
@@ -14,7 +16,7 @@ async function bootstrap() {
     'http://localhost:3000',
   ];
 
-  app.use((req, res, next) => {
+  app.use((req: Request, res: Response, next: NextFunction) => {
     res.setHeader(
       'Cache-Control',
       'no-store, no-cache, must-revalidate, proxy-revalidate',
@@ -44,4 +46,4 @@ async function bootstrap() {
 
   await app.listen(process.env.PORT ?? 3000);
 }
-bootstrap();
+void bootstrap();
