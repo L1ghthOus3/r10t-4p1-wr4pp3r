@@ -14,4 +14,12 @@ export class AccountController {
   ) {
     return this.accountService.getAccount(username, tagLine, query.region);
   }
+
+  @Get('accounts/by-puuid/:puuid')
+  getAccountByPuuid(
+    @Param('puuid') puuid: string,
+    @Query() query: RegionQueryDto,
+  ) {
+    return this.accountService.getAccountByPuuid(puuid, query.region);
+  }
 }
