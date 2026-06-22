@@ -10,6 +10,8 @@ import { MatchesController } from './match-v5/matches.controller';
 import { MatchesService } from './match-v5/matches.service';
 import { LolChallengesController } from './lol-challenges-v1/lol-challenges.controller';
 import { LolChallengesService } from './lol-challenges-v1/lol-challenges.service';
+import { ItemsController } from './items/items.controller';
+import { ItemsService } from './items/items.service';
 import { Match } from './match-v5/entities/match.entity';
 import { MatchSyncProgressStore } from './match-v5/match-sync-progress.store';
 import { MatchSyncScheduler } from './match-v5/match-sync.scheduler';
@@ -38,6 +40,7 @@ import { MatchSyncScheduler } from './match-v5/match-sync.scheduler';
     LeagueController,
     AccountController,
     LolChallengesController,
+    ItemsController,
   ],
   providers: [
     MatchesService,
@@ -46,6 +49,7 @@ import { MatchSyncScheduler } from './match-v5/match-sync.scheduler';
     LeagueService,
     AccountService,
     LolChallengesService,
+    ItemsService,
   ],
 })
 export class AppModule {}
