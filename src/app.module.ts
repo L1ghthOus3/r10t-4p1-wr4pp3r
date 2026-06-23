@@ -12,6 +12,7 @@ import { LolChallengesController } from './lol-challenges-v1/lol-challenges.cont
 import { LolChallengesService } from './lol-challenges-v1/lol-challenges.service';
 import { ItemsController } from './items/items.controller';
 import { ItemsService } from './items/items.service';
+import { HealthController } from './health.controller';
 import { Match } from './match-v5/entities/match.entity';
 import { MatchSyncProgressStore } from './match-v5/match-sync-progress.store';
 import { MatchSyncScheduler } from './match-v5/match-sync.scheduler';
@@ -23,15 +24,21 @@ import { MatchSyncScheduler } from './match-v5/match-sync.scheduler';
     TypeOrmModule.forRootAsync({
       inject: [ConfigService],
       useFactory: (config: ConfigService) => {
-        const url = config.get<string>('DATABASE_URL');
+        const raw = config.get<string>('DATABASE_URL');
+        // Drop sslmode from the URL so our ssl object governs TLS;
+        // pg now maps sslmode=require to strict verify-full.
+        let url: string | undefined;
+        if (raw) {
+          const parsed = new URL(raw);
+          parsed.searchParams.delete('sslmode');
+          url = parsed.toString();
+        }
         return {
           type: 'postgres' as const,
           // Prefer a single connection URL (Supabase), fall back to discrete vars.
           ...(url
             ? {
-                // Drop sslmode from the URL so our ssl object governs TLS;
-                // pg now maps sslmode=require to strict verify-full.
-                url: url.replace(/[?&]sslmode=[^&]*/i, ''),
+                url,
                 ssl: { rejectUnauthorized: false },
               }
             : {
@@ -49,6 +56,7 @@ import { MatchSyncScheduler } from './match-v5/match-sync.scheduler';
     TypeOrmModule.forFeature([Match]),
   ],
   controllers: [
+    HealthController,
     MatchesController,
     LeagueController,
     AccountController,

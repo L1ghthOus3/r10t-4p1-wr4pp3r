@@ -1,21 +1,32 @@
 import { ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
-import { NestExpressApplication } from '@nestjs/platform-express';
-import { type NextFunction, type Request, type Response } from 'express';
+import {
+  ExpressAdapter,
+  NestExpressApplication,
+} from '@nestjs/platform-express';
+import express, {
+  type NextFunction,
+  type Request,
+  type Response,
+} from 'express';
 import { AppModule } from './app.module';
 
-async function bootstrap() {
-  const app = await NestFactory.create<NestExpressApplication>(AppModule);
+const allowedOrigins = [
+  'https://5umm0n3r5-5c4nn3r.dev',
+  'http://localhost:5500',
+  'http://127.0.0.1:5500',
+  'http://localhost:3000',
+];
 
-  const expressApp = app.getHttpAdapter().getInstance();
+const expressApp = express();
+
+async function configure() {
+  const app = await NestFactory.create<NestExpressApplication>(
+    AppModule,
+    new ExpressAdapter(expressApp),
+  );
+
   expressApp.disable('etag');
-
-  const allowedOrigins = [
-    'https://5umm0n3r5-5c4nn3r.dev',
-    'http://localhost:5500',
-    'http://127.0.0.1:5500',
-    'http://localhost:3000',
-  ];
 
   app.use((req: Request, res: Response, next: NextFunction) => {
     res.setHeader(
@@ -45,6 +56,24 @@ async function bootstrap() {
 
   app.useGlobalPipes(new ValidationPipe({ transform: true, whitelist: true }));
 
-  await app.listen(process.env.PORT ?? 3000);
+  await app.init();
+  return app;
 }
-void bootstrap();
+
+// Build the Nest app once and reuse it across warm serverless invocations.
+let ready: Promise<unknown> | null = null;
+function bootstrap() {
+  if (!ready) ready = configure();
+  return ready;
+}
+
+// Vercel serverless entrypoint.
+export default async function handler(req: Request, res: Response) {
+  await bootstrap();
+  expressApp(req, res);
+}
+
+// Local / long-running host: start a real listening server.
+if (!process.env.VERCEL) {
+  void bootstrap().then(() => expressApp.listen(process.env.PORT ?? 3000));
+}
