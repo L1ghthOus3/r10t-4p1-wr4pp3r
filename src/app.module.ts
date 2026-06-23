@@ -22,16 +22,29 @@ import { MatchSyncScheduler } from './match-v5/match-sync.scheduler';
     ScheduleModule.forRoot(),
     TypeOrmModule.forRootAsync({
       inject: [ConfigService],
-      useFactory: (config: ConfigService) => ({
-        type: 'postgres',
-        host: config.get<string>('DB_HOST', 'localhost'),
-        port: config.get<number>('DB_PORT', 5432),
-        username: config.get<string>('DB_USERNAME', 'postgres'),
-        password: config.get<string>('DB_PASSWORD', ''),
-        database: config.get<string>('DB_NAME', 'sumsca'),
-        autoLoadEntities: true,
-        synchronize: true,
-      }),
+      useFactory: (config: ConfigService) => {
+        const url = config.get<string>('DATABASE_URL');
+        return {
+          type: 'postgres' as const,
+          // Prefer a single connection URL (Supabase), fall back to discrete vars.
+          ...(url
+            ? {
+                // Drop sslmode from the URL so our ssl object governs TLS;
+                // pg now maps sslmode=require to strict verify-full.
+                url: url.replace(/[?&]sslmode=[^&]*/i, ''),
+                ssl: { rejectUnauthorized: false },
+              }
+            : {
+                host: config.get<string>('DB_HOST', 'localhost'),
+                port: config.get<number>('DB_PORT', 5432),
+                username: config.get<string>('DB_USERNAME', 'postgres'),
+                password: config.get<string>('DB_PASSWORD', ''),
+                database: config.get<string>('DB_NAME', 'sumsca'),
+              }),
+          autoLoadEntities: true,
+          synchronize: config.get<string>('DB_SYNCHRONIZE', 'true') === 'true',
+        };
+      },
     }),
     TypeOrmModule.forFeature([Match]),
   ],
